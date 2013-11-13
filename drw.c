@@ -172,6 +172,24 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, const char *tex
 }
 
 void
+drw_xbm(Drw *drw, int x, int y, unsigned int w, unsigned int h, const unsigned char* xbm, unsigned int x_dim, unsigned int y_dim) {
+	int i, j;
+	int x_pos = (w - x_dim)/2;
+	int y_pos = (h - y_dim)/2;
+	if(!drw || !drw->scheme)
+		return;
+	XSetForeground(drw->dpy, drw->gc, drw->scheme->bg->rgb);
+	XFillRectangle(drw->dpy, drw->drawable, drw->gc, x, y, w, h);
+	XSetForeground(drw->dpy, drw->gc, drw->scheme->fg->rgb);
+	for(i=0; i<y_dim; i++) {
+		for(j=0; j<x_dim; j++) {
+			if(xbm[i] & (1 << j))
+				XDrawPoint(drw->dpy, drw->drawable, drw->gc, x_pos+j, y_pos+i);
+		}
+	}
+}
+
+void
 drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h) {
 	if(!drw)
 		return;

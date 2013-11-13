@@ -274,7 +274,7 @@ static const char broken[] = "broken";
 static char stext[256];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
-static int bh, blw = 0;      /* bar geometry */
+static int bh, blw = 0, bmw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
@@ -468,7 +468,8 @@ buttonpress(XEvent *e) {
 		focus(NULL);
 	}
 	if(ev->window == selmon->barwin) {
-		i = x = 0;
+		x = bmw;
+		i = 0;
 		do
 			x += TEXTW(tags[i]);
 		while(ev->x >= x && ++i < LENGTH(tags));
@@ -810,6 +811,7 @@ drawbar(Monitor *m) {
 	int x, xx, w;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
+	#include "arch.xbm"
 
 	resizebarwin(m);
 	for(c = m->clients; c; c = c->next) {
@@ -818,6 +820,11 @@ drawbar(Monitor *m) {
 			urg |= c->tags;
 	}
 	x = 0;
+	// draw Arch icon
+	drw_setscheme(drw, &scheme[SchemeSel]);
+	bmw = w = arch_width + 4;
+	drw_xbm(drw, x, 0, w, bh, arch_bits, arch_width, arch_height);
+	x += w;
 	for(i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
 		if(urg & 1 << i)
